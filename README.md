@@ -18,3 +18,14 @@ Or add it to your Gemfile:
 And then add a basic setup to your Guardfile:
 
     guard init combustion
+
+
+## Integration with guard-rspec
+
+If you are using guard-rspec, maybe you want to stop Combustion while running tests,
+just to avoid conflicts with the instance of Combustion created by Rspec.
+
+For doing that, you have to add theese lines into the `guard :rspec` block
+
+    callback(:run_all_begin) { CombustionHelper.stop_combustion }
+    callback(:run_on_modifications_begin) { CombustionHelper.stop_combustion }
