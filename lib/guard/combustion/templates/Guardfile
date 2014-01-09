@@ -1,0 +1,6 @@
+# Add files to watch, like the example:
+#   watch(%r{file/path})
+#
+guard :combustion do
+  watch(%r{^(app|config|lib|spec)/(.*)})
+end
