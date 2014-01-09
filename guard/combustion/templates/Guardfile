@@ -2,5 +2,5 @@
 #   watch(%r{file/path}) { `command(s)` }
 #
 guard :combustion do
-  watch(/(.*).txt/)
+  watch(%r{^(app|config|lib|spec)/(.*)})
 end
