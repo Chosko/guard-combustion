@@ -1,0 +1,6 @@
+# Add files to this file, like the example:
+#   watch(%r{file/path}) { `command(s)` }
+#
+guard :combustion do
+  watch(/(.*).txt/)
+end
