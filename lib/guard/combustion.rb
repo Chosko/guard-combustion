@@ -27,6 +27,3 @@ module Guard
     end
   end
 end
- 
-# Available options: :pidfile, :port, :executable
-guard 'redis'
