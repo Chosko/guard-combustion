@@ -42,6 +42,7 @@ class CombustionHelper
         end
       else
         puts "another instance of combustion is already running with pid #{pid}"
+        restart_combustion
       end
     end
 
@@ -52,9 +53,7 @@ class CombustionHelper
       puts "stopping combustion..."
       pid = get_combustion_pid
       if pid.nil?
-        puts "no instances of combustion were found, trying to kill it by command signature..."
-        command = combustion_cmd get_guard_combustion_port
-        puts `PSLINE=$(ps aux | grep "#{command}" | grep -v grep); IFS=' ' read -ra ADDR <<< $PSLINE; if [[ -n ${ADDR[1]} ]]; then kill -9 ${ADDR[1]}; echo "#{command} killed"; else echo "process #{command} not found: there wasn't any instance of combustion alive at all"; fi;`
+        puts "no instances of combustion were found"
       else
         `kill -9 #{pid}`
         puts "\033[22;31mcombustion stopped\x1b[0m"

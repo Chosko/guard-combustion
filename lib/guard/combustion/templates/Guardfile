@@ -1,5 +1,5 @@
-# Add files to this file, like the example:
-#   watch(%r{file/path}) { `command(s)` }
+# Add files to watch, like the example:
+#   watch(%r{file/path})
 #
 guard :combustion do
   watch(%r{^(app|config|lib|spec)/(.*)})
