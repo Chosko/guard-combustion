@@ -29,3 +29,5 @@ For doing that, you have to add theese lines into the `guard :rspec` block
 
     callback(:run_all_begin) { CombustionHelper.stop_combustion }
     callback(:run_on_modifications_begin) { CombustionHelper.stop_combustion }
+    callback(:run_all_end) { CombustionHelper.start_combustion }
+    callback(:run_on_modifications_end) { CombustionHelper.start_combustion }
