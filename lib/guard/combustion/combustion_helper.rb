@@ -1,9 +1,5 @@
 #
 # This class contains some useful functions to automatically manage the interaction between combustion and guard.
-# 
-# If you want to configure the port used by combustion, you have to write down into a file ".guard_combustion_port"
-# the desired port (located at the root of your engine). If ".guard_combustion_port" doesn't exists, it will be generated and configured with the default
-# port at the first use of guard.
 #
 class CombustionHelper
 
