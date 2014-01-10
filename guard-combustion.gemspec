@@ -16,6 +16,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'guard', '>= 1.1.0'
 
-  s.files        = %w(Readme.md LICENSE)
+  s.files        = %w(README.md LICENSE)
   s.files       += Dir["{lib}/**/*"]
 end
