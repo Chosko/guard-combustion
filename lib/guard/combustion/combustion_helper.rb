@@ -21,9 +21,9 @@ class CombustionHelper
         @@last_start = Time.now
         pid = get_combustion_pid
         if pid.nil?
-          puts "\033[22;31msomething went wrong, likely combustion were not started\x1b[0m"
+          puts "\033[22;31msomething went wrong, likely combustion was not started\x1b[0m"
         else
-          puts "\033[22;32mcombustion started and listening at port #{combustion_port} with pid #{pid}\x1b[0m"
+          puts "\033[22;32mcombustion started with pid #{pid} and listening on port #{combustion_port}\x1b[0m"
         end
       else
         puts "another instance of combustion is already running with pid #{pid}"
