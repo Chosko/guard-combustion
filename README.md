@@ -2,14 +2,7 @@
 
 This guard allows you to easily develop Rails engines with [Combustion](https://github.com/pat/combustion) with no need to manually restart the dummy application after every change.
 
-<!-- MarkdownTOC -->
-- [Install][install]
-- Configuration
-    - Combustion port
-    - Integration with guard-rspec (or any other guard)
-<!-- /MarkdownTOC -->
-
-## Install[install]
+## Install
 
 Make sure you have [guard](http://github.com/guard/guard) installed and Combustion fully configured on your Rails engine.
 
