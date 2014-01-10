@@ -1,31 +1,20 @@
 #
-# Questa classe contiene funzioni utili per la gestione automatica di combustion con guard
+# This class contains some useful functions to automatically manage the interaction between combustion and guard.
 # 
-# Per configurare la porta utilizzata da combustion, inserire in un file ".guard_combustion_port" la porta desiderata (solo il numero).
-# Se questo file non esiste, viene creato automaticamente al primo utilizzo di guard, utilizzando la porta di default.
-# 
-# NB: .guard_combustion_port è gitignored.
+# If you want to configure the port used by combustion, you have to write down into a file ".guard_combustion_port"
+# the desired port (located at the root of your engine). If ".guard_combustion_port" doesn't exists, it will be generated and configured with the default
+# port at the first use of guard.
 #
 class CombustionHelper
 
-  #
-  # La porta di default utilizzata da combustion.
-  # Questa porta viene utilizzata solo se non è già stata configurata in .guard_combustion_port
-  # 
-  # NB: per modificare la porta che si vuole far utilizzare a combustion non modificare direttamente questa variabile.
-  #     Leggere invece le istruzioni in cima alla classe
-  # 
   @@default_port = 9292
   @@last_start = Time.now - 5
   @@combustion_pid_file = "./tmp/.combustion_pid"
   @@guard_combustion_port = ".guard_combustion_port"
 
-  #
-  # Definisce tutti i metodi come statici
-  # 
   class << self
     #
-    # Avvia combustion
+    # Start combustion
     # 
     def start_combustion
       if get_combustion_pid.nil?
@@ -36,7 +25,7 @@ class CombustionHelper
         @@last_start = Time.now
         pid = get_combustion_pid
         if pid.nil?
-          puts "something went wrong, likely combustion were not started"
+          puts "\033[22;31msomething went wrong, likely combustion were not started\x1b[0m"
         else
           puts "\033[22;32mcombustion started and listening at port #{combustion_port} with pid #{pid}\x1b[0m"
         end
@@ -47,7 +36,7 @@ class CombustionHelper
     end
 
     #
-    # Uccide combustion
+    # Stop combustion
     # 
     def stop_combustion
       puts "stopping combustion..."
@@ -62,10 +51,10 @@ class CombustionHelper
     end
 
     #
-    # Riavvia combustion
+    # Restart combustion
     # 
     def restart_combustion
-      if Time.now > @@last_start + 1 # Controlla che il server non sia stato già avviato meno di 1 secondo fa
+      if Time.now > @@last_start + 1 # Check if the server started less than a second ago
         puts "\033[01;33mrestarting combustion...\x1b[0m"
         stop_combustion
         start_combustion
@@ -75,7 +64,7 @@ class CombustionHelper
   private
 
     #
-    # Scrive la porta di default che verrà utilizzata per combustion in un file .guard_combustion_port
+    # Write the port that will be used by combustion into .guard_combustion_port
     # 
     def set_guard_combustion_port
       file = File.open(@@guard_combustion_port, "w")
@@ -85,8 +74,8 @@ class CombustionHelper
     end
 
     #
-    # Legge la porta di default che viene utilizzata per combustion dal file .guard_combustion_port
-    # Se il file non esiste, lo crea e gli assegna la porta di default
+    # Read the port from .guard_combustion_port
+    # If .guard_combustion_port doesn't exists, create it and fill it with the default port.
     # 
     def get_guard_combustion_port
       begin
@@ -106,7 +95,7 @@ class CombustionHelper
     end
 
     # 
-    # Legge il pid di combustion dal file .combustion_pid
+    # Read combustion's pid from .combustion_pid
     # 
     def get_combustion_pid
       begin
@@ -126,7 +115,7 @@ class CombustionHelper
     end
 
     # 
-    # Elimina il file .combustion_pid   
+    # Delete .combustion_pid
     # 
     def delete_combustion_pid
       if File.exists? @@combustion_pid_file
@@ -135,7 +124,7 @@ class CombustionHelper
     end
 
     #
-    # Restituisce su una stringa il comando shell utilizzato per avviare combustion
+    # Return a string with the shell command used for starting combustion
     # 
     def combustion_cmd combustion_port
       "rackup -p #{combustion_port} -D -P #{@@combustion_pid_file}"
