@@ -1,11 +1,28 @@
 #
 # This class contains some useful functions to automatically manage the interaction between combustion and guard.
-#
+# 
+# @author [chosko]
+# 
 class CombustionHelper
 
+  #
+  # A default port for combustion
+  # 
   @@default_port = 9292
+
+  #
+  # This variable records the last time that combustion was started
+  # 
   @@last_start = Time.now - 5
+
+  #
+  # The pid file path
+  # 
   @@combustion_pid_file = "./tmp/.combustion_pid"
+
+  #
+  # The .guard_combustion_port file path
+  # 
   @@guard_combustion_port = ".guard_combustion_port"
 
   class << self
@@ -71,6 +88,7 @@ class CombustionHelper
 
     #
     # Read the port from .guard_combustion_port
+    # 
     # If .guard_combustion_port doesn't exists, create it and fill it with the default port.
     # 
     def get_guard_combustion_port
