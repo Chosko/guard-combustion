@@ -92,6 +92,13 @@ class CombustionHelper
 
   private
 
+
+    # 
+    # Make a string colored
+    # @param  string [String] The string to make colored
+    # @param  color=nil [String] The name of the color (e.g. 'yellow')
+    # 
+    # @return [String] the input string colored
     def strcolor(string, color=nil)
       return string if !@@options[:colors] || color.nil?
 
@@ -107,6 +114,12 @@ class CombustionHelper
       end
     end
 
+    # 
+    # Recursively merge two hashes, with major priority for the second hash
+    # @param  hash1 [Hash] The first hash
+    # @param  hash2 [Hash] The second hash
+    # 
+    # @return [Hash] The merged hash
     def _deep_merge(hash1, hash2)
       hash1.merge(hash2) do |key, oldval, newval|
         if oldval.instance_of?(Hash) && newval.instance_of?(Hash)
