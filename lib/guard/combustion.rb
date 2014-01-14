@@ -1,5 +1,5 @@
 require 'guard'
-require 'guard/guard'
+require 'guard/plugin'
 require 'guard/combustion/version'
 require 'guard/combustion/combustion_helper'
 
@@ -15,7 +15,12 @@ module Guard
   # 
   # @author [chosko]
   #   
-  class Combustion < Guard
+  class Combustion < Plugin
+
+    def initialize (options = {})
+      super
+      CombustionHelper.set_options(options)
+    end
 
     def start
       CombustionHelper.start_combustion
