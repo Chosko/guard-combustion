@@ -6,6 +6,25 @@
 class CombustionHelper
 
   #
+  # Default options
+  # 
+  DEFAULTS = {
+    # The file where is stored the pid of combustion
+    combustion_pid_file: "./tmp/.combustion_pid",
+
+    # The file where is stored the port used by combustion
+    guard_combustion_port_file: ".guard_combustion_port",
+    
+    # Coloured prints
+    colors: true
+  }.freeze
+
+  #
+  # The options for combustion
+  # 
+  @@options = DEFAULTS
+
+  #
   # A default port for combustion
   # 
   @@default_port = 9292
@@ -15,17 +34,14 @@ class CombustionHelper
   # 
   @@last_start = Time.now - 5
 
-  #
-  # The pid file path
-  # 
-  @@combustion_pid_file = "./tmp/.combustion_pid"
-
-  #
-  # The .guard_combustion_port file path
-  # 
-  @@guard_combustion_port = ".guard_combustion_port"
-
   class << self
+    #
+    # Set the options for combustion
+    # 
+    def set_options(options = {})
+      @@options = _deep_merge(DEFAULTS, options).freeze
+    end
+
     #
     # Start combustion
     # 
@@ -38,9 +54,9 @@ class CombustionHelper
         @@last_start = Time.now
         pid = get_combustion_pid
         if pid.nil?
-          puts "\033[22;31msomething went wrong, likely combustion was not started\x1b[0m"
+          puts strcolor("something went wrong, likely combustion was not started", "red")
         else
-          puts "\033[22;32mcombustion started with pid #{pid} and listening on port #{combustion_port}\x1b[0m"
+          puts strcolor("combustion started with pid #{pid} and listening on port #{combustion_port}", "green")
         end
       else
         puts "another instance of combustion is already running with pid #{pid}"
@@ -58,7 +74,7 @@ class CombustionHelper
         puts "no instances of combustion were found"
       else
         `kill -9 #{pid}`
-        puts "\033[22;31mcombustion stopped\x1b[0m"
+        puts strcolor("combustion stopped", "red")
         delete_combustion_pid
       end
     end
@@ -68,7 +84,7 @@ class CombustionHelper
     # 
     def restart_combustion
       if Time.now > @@last_start + 1 # Check if the server started less than a second ago
-        puts "\033[01;33mrestarting combustion...\x1b[0m"
+        puts strcolor("restarting combustion...", "yellow")
         stop_combustion
         start_combustion
       end
@@ -76,11 +92,49 @@ class CombustionHelper
 
   private
 
+
+    # 
+    # Make a string colored
+    # @param  string [String] The string to make colored
+    # @param  color=nil [String] The name of the color (e.g. 'yellow')
+    # 
+    # @return [String] the input string colored
+    def strcolor(string, color=nil)
+      return string if !@@options[:colors] || color.nil?
+
+      case color
+      when "green"
+        "\033[22;32m#{string}\x1b[0m"
+      when "red"
+        "\033[22;31m#{string}\x1b[0m"
+      when "yellow"
+        "\033[01;33m#{string}\x1b[0m"
+      else
+        string
+      end
+    end
+
+    # 
+    # Recursively merge two hashes, with major priority for the second hash
+    # @param  hash1 [Hash] The first hash
+    # @param  hash2 [Hash] The second hash
+    # 
+    # @return [Hash] The merged hash
+    def _deep_merge(hash1, hash2)
+      hash1.merge(hash2) do |key, oldval, newval|
+        if oldval.instance_of?(Hash) && newval.instance_of?(Hash)
+          _deep_merge(oldval, newval)
+        else
+          newval
+        end
+      end
+    end
+
     #
     # Write the port that will be used by combustion into .guard_combustion_port
     # 
     def set_guard_combustion_port
-      file = File.open(@@guard_combustion_port, "w")
+      file = File.open(@@options[:guard_combustion_port_file], "w")
       file.write(@@default_port.to_s)
       file.close
       @@default_port
@@ -93,8 +147,8 @@ class CombustionHelper
     # 
     def get_guard_combustion_port
       begin
-        if File.exists? @@guard_combustion_port
-          file = File.open(@@guard_combustion_port, "r")
+        if File.exists? @@options[:guard_combustion_port_file]
+          file = File.open(@@options[:guard_combustion_port_file], "r")
           contents = file.read
           combustion_port = Integer(contents.split("\n")[0])
           file.close
@@ -113,8 +167,8 @@ class CombustionHelper
     # 
     def get_combustion_pid
       begin
-        if File.exists? @@combustion_pid_file
-          file = File.open(@@combustion_pid_file, "r")
+        if File.exists? @@options[:combustion_pid_file]
+          file = File.open(@@options[:combustion_pid_file], "r")
           contents = file.read
           combustion_pid = Integer(contents.split("\n")[0])
           file.close
@@ -132,8 +186,8 @@ class CombustionHelper
     # Delete .combustion_pid
     # 
     def delete_combustion_pid
-      if File.exists? @@combustion_pid_file
-        File.delete(@@combustion_pid_file)
+      if File.exists? @@options[:combustion_pid_file]
+        File.delete(@@options[:combustion_pid_file])
       end
     end
 
@@ -141,7 +195,7 @@ class CombustionHelper
     # Return a string with the shell command used for starting combustion
     # 
     def combustion_cmd combustion_port
-      "rackup -p #{combustion_port} -D -P #{@@combustion_pid_file}"
+      "rackup -p #{combustion_port} -D -P #{@@options[:combustion_pid_file]}"
     end
   end
 end
