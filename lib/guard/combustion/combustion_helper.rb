@@ -46,20 +46,21 @@ class CombustionHelper
     # Start combustion
     # 
     def start_combustion
-      if get_combustion_pid.nil?
-        puts "starting combustion..."
+      pid = get_combustion_pid
+      if pid.nil?
+        ::Guard::UI.info "Starting combustion..."
         combustion_port = get_guard_combustion_port
         `#{combustion_cmd(combustion_port)}`
         sleep(1)
         @@last_start = Time.now
         pid = get_combustion_pid
         if pid.nil?
-          puts strcolor("something went wrong, likely combustion was not started", "red")
+          ::Guard::UI.error "Something went wrong, likely Combustion was not started"
         else
-          puts strcolor("combustion started with pid #{pid} and listening on port #{combustion_port}", "green")
+          ::Guard::UI.info strcolor("Combustion started with pid #{pid} and listening on port #{combustion_port}", "green")
         end
       else
-        puts "another instance of combustion is already running with pid #{pid}"
+        ::Guard::UI.warning "Another instance of Combustion is already running with pid #{pid}"
         restart_combustion
       end
     end
@@ -68,13 +69,13 @@ class CombustionHelper
     # Stop combustion
     # 
     def stop_combustion
-      puts "stopping combustion..."
+      ::Guard::UI.info "Stopping combustion..."
       pid = get_combustion_pid
       if pid.nil?
-        puts "no instances of combustion were found"
+        ::Guard::UI.warning "No instances of combustion were found"
       else
         `kill -9 #{pid}`
-        puts strcolor("combustion stopped", "red")
+        ::Guard::UI.info strcolor("Combustion stopped", "red")
         delete_combustion_pid
       end
     end
@@ -84,7 +85,7 @@ class CombustionHelper
     # 
     def restart_combustion
       if Time.now > @@last_start + 1 # Check if the server started less than a second ago
-        puts strcolor("restarting combustion...", "yellow")
+        ::Guard::UI.info "Restarting combustion..."
         stop_combustion
         start_combustion
       end

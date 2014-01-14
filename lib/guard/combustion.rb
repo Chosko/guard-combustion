@@ -23,6 +23,7 @@ module Guard
     end
 
     def start
+      ::Guard::UI.info "Guard::Combustion is running"
       CombustionHelper.start_combustion
     end
  
