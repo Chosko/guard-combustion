@@ -12,7 +12,7 @@ Install the gem with:
 
 Or add it to your Gemfile:
 
-    gem "guard-combustion", "~> 0.1.1"
+    gem "guard-combustion", "~> 1.0.0"
 
 And then add a basic setup to your Guardfile:
 
