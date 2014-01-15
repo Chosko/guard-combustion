@@ -86,9 +86,11 @@ to avoid conflicts with the instance of Combustion created by Rspec.
 
 For doing that, you have to add theese lines into the `guard :rspec` block
 
-    callback(:run_all_begin) { CombustionHelper.stop_combustion }
-    callback(:run_on_modifications_begin) { CombustionHelper.stop_combustion }
-    callback(:run_all_end) { CombustionHelper.start_combustion }
-    callback(:run_on_modifications_end) { CombustionHelper.start_combustion }
+```ruby
+callback(:run_all_begin) { Guard::CombustionHelper.stop_combustion }
+callback(:run_on_modifications_begin) { Guard::CombustionHelper.stop_combustion }
+callback(:run_all_end) { Guard::CombustionHelper.start_combustion }
+callback(:run_on_modifications_end) { Guard::CombustionHelper.start_combustion }
+```
 
 For more informations about callbacks, see https://github.com/guard/guard/wiki/Hooks-and-callbacks
