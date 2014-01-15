@@ -9,11 +9,14 @@ class CombustionHelper
   # Default options
   # 
   DEFAULTS = {
+    # The listening port of combustion
+    port: 9292,
+
     # The file where is stored the pid of combustion
-    combustion_pid_file: "./tmp/.combustion_pid",
+    pid_file: "./tmp/.combustion_pid",
 
     # The file where is stored the port used by combustion
-    guard_combustion_port_file: ".guard_combustion_port",
+    custom_port_file: ".guard_combustion_port",
     
     # Coloured prints
     colors: true
@@ -25,11 +28,6 @@ class CombustionHelper
   @@options = DEFAULTS
 
   #
-  # A default port for combustion
-  # 
-  @@default_port = 9292
-
-  #
   # This variable records the last time that combustion was started
   # 
   @@last_start = Time.now - 5
@@ -39,7 +37,7 @@ class CombustionHelper
     # Set the options for combustion
     # 
     def set_options(options = {})
-      @@options = _deep_merge(DEFAULTS, options).freeze
+      @@options = _deep_merge(DEFAULTS, options)
     end
 
     #
@@ -132,34 +130,28 @@ class CombustionHelper
     end
 
     #
-    # Write the port that will be used by combustion into .guard_combustion_port
+    # Read the port from .guard_combustion_port, if the file exists.
     # 
-    def set_guard_combustion_port
-      file = File.open(@@options[:guard_combustion_port_file], "w")
-      file.write(@@default_port.to_s)
-      file.close
-      @@default_port
-    end
-
-    #
-    # Read the port from .guard_combustion_port
-    # 
-    # If .guard_combustion_port doesn't exists, create it and fill it with the default port.
+    # Else, use the port configured by option, or the default port.
     # 
     def get_guard_combustion_port
       begin
-        if File.exists? @@options[:guard_combustion_port_file]
-          file = File.open(@@options[:guard_combustion_port_file], "r")
+        if File.exists? @@options[:custom_port_file]
+          file = File.open(@@options[:custom_port_file], "r")
           contents = file.read
           combustion_port = Integer(contents.split("\n")[0])
           file.close
+          ::Guard::UI.info "Custom port configuration file detected at #{@@options[:custom_port_file]} - Using port #{combustion_port} instead of #{@@options[:port]}."
+          ::Guard::UI.info "If you want to use the port defined into the Guardfile, please remove #{@@options[:custom_port_file]}"
           combustion_port
         else
-          set_guard_combustion_port
+          @@options[:port]
         end
       rescue ArgumentError => e
         file.close
-        set_guard_combustion_port
+        ::Guard::UI.error "Failed to load custom port from " + @@options[:custom_port_file] + ", because it contains non-integer value."
+        ::Guard::UI.warning "Using the default port: " + @@options[:port].to_s
+        @@options[:port]
       end
     end
 
@@ -168,8 +160,8 @@ class CombustionHelper
     # 
     def get_combustion_pid
       begin
-        if File.exists? @@options[:combustion_pid_file]
-          file = File.open(@@options[:combustion_pid_file], "r")
+        if File.exists? @@options[:pid_file]
+          file = File.open(@@options[:pid_file], "r")
           contents = file.read
           combustion_pid = Integer(contents.split("\n")[0])
           file.close
@@ -187,8 +179,8 @@ class CombustionHelper
     # Delete .combustion_pid
     # 
     def delete_combustion_pid
-      if File.exists? @@options[:combustion_pid_file]
-        File.delete(@@options[:combustion_pid_file])
+      if File.exists? @@options[:pid_file]
+        File.delete(@@options[:pid_file])
       end
     end
 
@@ -196,7 +188,7 @@ class CombustionHelper
     # Return a string with the shell command used for starting combustion
     # 
     def combustion_cmd combustion_port
-      "rackup -p #{combustion_port} -D -P #{@@options[:combustion_pid_file]}"
+      "rackup -p #{combustion_port} -D -P #{@@options[:pid_file]}"
     end
   end
 end
